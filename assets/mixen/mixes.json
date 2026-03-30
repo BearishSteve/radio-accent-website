@@ -1,0 +1,156 @@
+{
+  "generated_at": "2026-03-11T15:24:11+00:00",
+  "station_name": "Accent FM",
+  "shows": [
+    {
+      "slug": "airplay-rewind",
+      "show_name": "AIRPLAY REWIND",
+      "description": "De beste hits, van toen en nu in de mix!",
+      "source_file": "Z:\\AIRPLAY REWIND\\Accent.mp3",
+      "file_name": "Accent.mp3",
+      "title": "AIRPLAY REWIND - Accent",
+      "artist": "DJ BEAR",
+      "album": "AIRPLAY REWIND",
+      "genre": "DJ Mix",
+      "updated_at": "2026-03-11T15:16:50+00:00",
+      "audio_url": "https://www.radioaccent.be/assets/mixen/airplay-rewind/latest.mp3",
+      "page_title": "AIRPLAY REWIND",
+      "schedule": "Wekelijkse avondmix",
+      "cover_url": "https://www.radioaccent.be/assets/mixen/airplay-rewind/cover.jpg"
+    },
+    {
+      "slug": "dj-irisss-frequencies",
+      "show_name": "FREQUENCIES",
+      "description": "De donderdag warming-up voor het weekend!",
+      "source_file": "Z:\\DJ IRISSS - FREQUENCIES\\Accent.mp3",
+      "file_name": "Accent.mp3",
+      "title": "FREQUENCIES - Accent",
+      "artist": "DJ IRISSS",
+      "album": "FREQUENCIES",
+      "genre": "DJ Mix",
+      "updated_at": "2026-03-11T15:24:11+00:00",
+      "audio_url": "https://www.radioaccent.be/assets/mixen/frequencies/latest.mp3",
+      "page_title": "FREQUENCIES",
+      "schedule": "Elke donderdag avond tussen 22 en 23 uur",
+      "cover_url": ""
+    },
+    {
+      "slug": "smooth-l-attitude-uur1",
+      "show_name": "L'ATTITUDE FM - UUR1",
+      "description": "Smooth tunes to start the weekend!",
+      "source_file": "Z:\\SMOOTH - L'ATTITUDE\\UUR1\\L'Attitude FM-Part 1.mp3",
+      "file_name": "L'Attitude FM-Part 1.mp3",
+      "title": "L'ATTITUDE FM - UUR1 - L'Attitude FM-Part 1",
+      "artist": "DJ SMOOTH",
+      "album": "L'ATTITUDE FM - UUR1",
+      "genre": "DJ Mix",
+      "updated_at": "2026-03-11T15:18:58+00:00",
+      "audio_url": "https://www.radioaccent.be/assets/mixen/l'attitude/uur1/latest.mp3",
+      "page_title": "L'ATTITUDE FM - UUR1",
+      "schedule": "Elke vrijdag avond tussen 22 en 23 uur",
+      "cover_url": "https://www.radioaccent.be/assets/mixen/l'attitude/uur1/cover.jpg"
+    },
+    {
+      "slug": "smooth-l-attitude-uur2",
+      "show_name": "L'ATTITUDE FM - UUR2",
+      "description": "Smooth tunes to start the weekend!",
+      "source_file": "Z:\\SMOOTH - L'ATTITUDE\\UUR2\\L'Attitude FM-Part 2.mp3",
+      "file_name": "L'Attitude FM-Part 2.mp3",
+      "title": "L'ATTITUDE FM - UUR2 - L'Attitude FM-Part 2",
+      "artist": "DJ SMOOTH",
+      "album": "L'ATTITUDE FM - UUR2",
+      "genre": "DJ Mix",
+      "updated_at": "2026-03-11T15:20:02+00:00",
+      "audio_url": "https://www.radioaccent.be/assets/mixen/l'attitude/uur2/latest.mp3",
+      "page_title": "L'ATTITUDE FM - UUR2",
+      "schedule": "Elke vrijdag avond tussen 23 en 24 uur",
+      "cover_url": "https://www.radioaccent.be/assets/mixen/l'attitude/uur2/cover.jpg"
+    }
+  ],
+  "mixes": [
+    {
+      "title": "AIRPLAY REWIND",
+      "dj": "DJ BEAR",
+      "schedule": "Wekelijkse avondmix",
+      "description": "De beste hits, van toen en nu in de mix!",
+      "streamUrl": "https://www.radioaccent.be/assets/mixen/airplay-rewind/latest.mp3",
+      "cover": "https://www.radioaccent.be/assets/mixen/airplay-rewind/cover.jpg",
+      "updatedAt": "2026-03-11T15:16:50+00:00",
+      "slug": "airplay-rewind",
+      "replays": [
+        {
+          "label": "Update van 11 maart 2026",
+          "url": "https://www.radioaccent.be/assets/mixen/airplay-rewind/latest.mp3",
+          "updatedAt": "2026-03-11T15:16:50+00:00",
+          "note": "Nieuwste versie van de weekly rewind."
+        },
+        {
+          "label": "Replay van 4 maart 2026",
+          "url": "https://www.radioaccent.be/assets/mixen/airplay-rewind/latest.mp3",
+          "updatedAt": "2026-03-04T15:05:00+00:00",
+          "note": "Vorige weekeditie ter referentie in het archief."
+        }
+      ]
+    },
+    {
+      "title": "FREQUENCIES",
+      "dj": "DJ IRISSS",
+      "schedule": "Elke donderdag avond tussen 22 en 23 uur",
+      "description": "De donderdag warming-up voor het weekend!",
+      "streamUrl": "https://www.radioaccent.be/assets/mixen/frequencies/latest.mp3",
+      "cover": "",
+      "updatedAt": "2026-03-11T15:24:11+00:00",
+      "slug": "dj-irisss-frequencies",
+      "replays": [
+        {
+          "label": "Update van 11 maart 2026",
+          "url": "https://www.radioaccent.be/assets/mixen/frequencies/latest.mp3",
+          "updatedAt": "2026-03-11T15:24:11+00:00",
+          "note": "Laatste upload vanuit de mix-feed."
+        },
+        {
+          "label": "Replay van 27 februari 2026",
+          "url": "https://www.radioaccent.be/assets/mixen/frequencies/latest.mp3",
+          "updatedAt": "2026-02-27T21:58:00+00:00",
+          "note": "Vorige editie met dezelfde host."
+        }
+      ]
+    },
+    {
+      "title": "L'ATTITUDE FM - UUR1",
+      "dj": "DJ SMOOTH",
+      "schedule": "Elke vrijdag avond tussen 22 en 23 uur",
+      "description": "Smooth tunes to start the weekend!",
+      "streamUrl": "https://www.radioaccent.be/assets/mixen/l'attitude/uur1/latest.mp3",
+      "cover": "https://www.radioaccent.be/assets/mixen/l'attitude/uur1/cover.jpg",
+      "updatedAt": "2026-03-11T15:18:58+00:00",
+      "slug": "smooth-l-attitude-uur1",
+      "replays": [
+        {
+          "label": "Uur 1 - laatste versie",
+          "url": "https://www.radioaccent.be/assets/mixen/l'attitude/uur1/latest.mp3",
+          "updatedAt": "2026-03-11T15:18:58+00:00",
+          "note": "Actuele replay voor het eerste uur."
+        }
+      ]
+    },
+    {
+      "title": "L'ATTITUDE FM - UUR2",
+      "dj": "DJ SMOOTH",
+      "schedule": "Elke vrijdag avond tussen 23 en 24 uur",
+      "description": "Smooth tunes to start the weekend!",
+      "streamUrl": "https://www.radioaccent.be/assets/mixen/l'attitude/uur2/latest.mp3",
+      "cover": "https://www.radioaccent.be/assets/mixen/l'attitude/uur2/cover.jpg",
+      "updatedAt": "2026-03-11T15:20:02+00:00",
+      "slug": "smooth-l-attitude-uur2",
+      "replays": [
+        {
+          "label": "Uur 2 - laatste versie",
+          "url": "https://www.radioaccent.be/assets/mixen/l'attitude/uur2/latest.mp3",
+          "updatedAt": "2026-03-11T15:20:02+00:00",
+          "note": "Actuele replay voor het tweede uur."
+        }
+      ]
+    }
+  ]
+}

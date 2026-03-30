@@ -1,0 +1,56 @@
+[
+  {
+    "id": "accent-ochtend",
+    "title": "Accent Ochtend",
+    "subtitle": "Met jouw dagelijkse energiestart",
+    "tagline": "Nieuws, verkeer en feelgood tracks om de dag strak te openen.",
+    "daysLabel": "Maandag tot vrijdag",
+    "time": "07:00 - 10:00",
+    "logoSrc": "/assets/112x32.png",
+    "backgroundImageSrc": "/assets/show-backgrounds/morning.jpg",
+    "hostImageSrc": "/assets/show-hosts/ochtend.png",
+    "hostAlt": "Presentator van Accent Ochtend",
+    "hostPlacement": "offset-right",
+    "theme": "morning",
+    "cta": {
+      "href": "/programmas/accent-ochtend",
+      "label": "Bekijk show"
+    }
+  },
+  {
+    "id": "frequencies",
+    "title": "Frequencies",
+    "subtitle": "DJ IRISSS",
+    "tagline": "De donderdagse warming-up voor het weekend, met clubenergie en strakke transitions.",
+    "daysLabel": "Donderdag",
+    "time": "22:00 - 23:00",
+    "logoSrc": "/assets/112x32.png",
+    "backgroundImageSrc": "/assets/show-backgrounds/mix.jpg",
+    "hostImageSrc": "/assets/show-hosts/irisss.png",
+    "hostAlt": "DJ IRISSS",
+    "hostPlacement": "center",
+    "theme": "mix",
+    "cta": {
+      "href": "/mixen/frequencies",
+      "label": "Luister mix"
+    }
+  },
+  {
+    "id": "accent-weekend",
+    "title": "Accent Weekend",
+    "subtitle": "De losse weekendflow van Radio Accent",
+    "tagline": "Meer ruimte voor classics, requests en langere radio-momenten met weekendkleur.",
+    "daysLabel": "Weekend",
+    "time": "10:00 - 14:00",
+    "logoSrc": "/assets/112x32.png",
+    "backgroundImageSrc": "/assets/show-backgrounds/weekend.jpg",
+    "hostImageSrc": "/assets/show-hosts/weekend.png",
+    "hostAlt": "Weekend host",
+    "hostPlacement": "offset-left",
+    "theme": "weekend",
+    "cta": {
+      "href": "/programmas/accent-weekend",
+      "label": "Meer info"
+    }
+  }
+]

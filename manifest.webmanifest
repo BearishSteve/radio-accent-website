@@ -1,0 +1,31 @@
+{
+  "name": "Radio Accent",
+  "short_name": "Accent",
+  "description": "Luister live naar Radio Accent met playlist, programma's en mixen.",
+  "start_url": "index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f8fc",
+  "theme_color": "#17365b",
+  "lang": "nl-BE",
+  "icons": [
+    {
+      "src": "assets/600x600.png",
+      "sizes": "600x600",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/600x600.png",
+      "sizes": "600x600",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/1400x1400.png",
+      "sizes": "1400x1400",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

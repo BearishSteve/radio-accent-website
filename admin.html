@@ -1,0 +1,333 @@
+﻿<!DOCTYPE html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Beheerconsole voor schema, mixen, nieuws en site-updates van Radio Accent." />
+    <meta name="robots" content="noindex,nofollow" />
+    <meta name="theme-color" content="#17365b" />
+    <title>Radio Accent | Beheerconsole</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="assets/600x600.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/32x32.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Teko:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=20260330b" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="index.html" aria-label="Ga naar de startpagina">
+          <span class="brand-wordmark" aria-hidden="true"><em>RADIO</em><strong>ACCENT</strong></span>
+          <span class="sr-only" data-station-name>Radio Accent</span>
+        </a>
+        <button class="menu-toggle" aria-expanded="false" aria-controls="main-nav">Menu</button>
+        <nav id="main-nav" class="main-nav" aria-label="Hoofdmenu">
+          <a href="index.html">Home</a>
+          <a href="programmas.html">Programma's</a>
+          <a href="mixen.html">Mixen</a>
+          <a href="luisteren.html">Hoe luisteren?</a>
+          <a href="playlist.html">Playlist</a>
+          <a class="btn btn-small" data-stream-link href="https://clubfmserver.be/accentdab.mp3">Luister live</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <div class="container">
+          <p class="eyebrow">Beheer</p>
+          <h1>Beheersconsole voor content en live updates</h1>
+          <p>Beheer schema, mixen, nieuws, siteberichten en contactflow vanuit Ã©Ã©n console. Zonder API werkt lokale modus alleen op dit toestel.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="container admin-shell">
+          <div id="admin-login" class="admin-login">
+            <h2>Inloggen</h2>
+            <form id="admin-login-form" class="admin-form-grid">
+              <label for="admin-passcode">Toegangscode</label>
+              <input id="admin-passcode" type="password" placeholder="Voer je beheercode in" required />
+              <button class="btn" type="submit">Open beheer</button>
+              <p id="admin-login-feedback" class="contact-feedback"></p>
+            </form>
+          </div>
+
+          <div id="admin-console" class="admin-console" hidden>
+            <div class="admin-head">
+              <h2>Content beheren</h2>
+              <div class="admin-head-actions">
+                <button id="admin-add-schedule" class="btn btn-small btn-ghost" type="button">+ Schema item</button>
+                <button id="admin-add-mix" class="btn btn-small btn-ghost" type="button">+ Mix item</button>
+                <button id="admin-add-news" class="btn btn-small btn-ghost" type="button">+ Nieuwsitem</button>
+                <button id="admin-add-history-kind" class="btn btn-small btn-ghost" type="button">+ History rule</button>
+                <button id="admin-add-keyword-cover" class="btn btn-small btn-ghost" type="button">+ Keyword cover</button>
+              </div>
+            </div>
+
+            <h3>Huidige DAB-slide</h3>
+            <div class="admin-dab-preview">
+              <div class="admin-dab-preview-card">
+                <img
+                  id="admin-dab-preview-image"
+                  src="assets/logo_dab.png"
+                  alt="Huidige DAB-slide"
+                  loading="lazy"
+                />
+              </div>
+              <div id="admin-dab-preview-meta" class="admin-dab-preview-meta" data-tone="info">
+                <p id="admin-dab-preview-title">Nog geen DAB-slide geladen.</p>
+                <p id="admin-dab-preview-time" class="admin-dab-preview-time"></p>
+                <button id="admin-dab-preview-refresh" class="btn btn-small btn-ghost" type="button">Ververs preview</button>
+              </div>
+            </div>
+
+            <div class="admin-tabs" role="tablist" aria-label="Beheer onderdelen">
+              <button id="admin-tab-schedule" class="admin-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="admin-panel-schedule">Programma's</button>
+              <button id="admin-tab-mixes" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-mixes">Mixen</button>
+              <button id="admin-tab-news" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-news">Nieuws</button>
+              <button id="admin-tab-status" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-status">Status</button>
+              <button id="admin-tab-history-kinds" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-history-kinds">History</button>
+              <button id="admin-tab-keywords" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-keywords">Keywords</button>
+              <button id="admin-tab-inbox" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-inbox">Inbox</button>
+              <button id="admin-tab-backups" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-backups">Backups</button>
+              <button id="admin-tab-monitor" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-panel-monitor">Monitor</button>
+            </div>
+
+            <section id="admin-panel-schedule" class="admin-panel is-active" role="tabpanel" aria-labelledby="admin-tab-schedule">
+              <h3>Programmaschema</h3>
+              <div id="admin-schedule-list" class="admin-list"></div>
+            </section>
+
+            <section id="admin-panel-mixes" class="admin-panel" role="tabpanel" aria-labelledby="admin-tab-mixes" hidden>
+              <h3>Mixen</h3>
+              <div id="admin-mixes-list" class="admin-list"></div>
+            </section>
+
+            <section id="admin-panel-news" class="admin-panel" role="tabpanel" aria-labelledby="admin-tab-news" hidden>
+              <h3>Nieuwsitems</h3>
+              <p>Deze items voeden de nieuwsflow en kunnen ook gebruikt worden als extra highlight op de homepagina.</p>
+              <section class="admin-settings-card" aria-labelledby="admin-news-feed-title">
+                <div class="admin-settings-card-header">
+                  <h4 id="admin-news-feed-title">RSS instellingen</h4>
+                  <p>Gebruik een externe feed voor de nieuwsartikels. Bij een lege of onbereikbare feed valt de site automatisch terug op de manuele nieuwsitems hieronder.</p>
+                </div>
+                <div id="admin-news-feed-form" class="admin-settings-grid">
+                  <label class="admin-checkbox">
+                    <input id="admin-news-feed-enabled" type="checkbox" />
+                    <span>Gebruik RSS-feed voor nieuwsartikels</span>
+                  </label>
+                  <label class="admin-settings-span-2">RSS feed URL<input id="admin-news-feed-url" type="url" placeholder="https://voorbeeld.be/feed.xml" /></label>
+                  <label>Max items<input id="admin-news-feed-limit" type="number" min="1" max="20" value="6" /></label>
+                  <label>Cache (minuten)<input id="admin-news-feed-cache" type="number" min="1" max="1440" value="15" /></label>
+                </div>
+              </section>
+              <div id="admin-news-list" class="admin-list"></div>
+            </section>
+
+            <section id="admin-panel-status" class="admin-panel" role="tabpanel" aria-labelledby="admin-tab-status" hidden>
+              <h3>Site status en media</h3>
+              <p>Gebruik dit blok voor tijdelijke liveberichten, speciale uitzendingen of een service-update.</p>
+              <div id="admin-site-status-form" class="admin-settings-grid">
+                <label class="admin-checkbox">
+                  <input id="admin-site-status-enabled" type="checkbox" />
+                  <span>Statusbanner tonen op de site</span>
+                </label>
+                <label>Tone
+                  <select id="admin-site-status-tone">
+                    <option value="info">Info</option>
+                    <option value="success">Succes</option>
+                    <option value="warning">Waarschuwing</option>
+                  </select>
+                </label>
+                <label>Titel<input id="admin-site-status-title" type="text" placeholder="Bijvoorbeeld: Speciale live-uitzending" /></label>
+                <label>CTA label<input id="admin-site-status-cta-label" type="text" placeholder="Bijvoorbeeld: Lees meer" /></label>
+                <label class="admin-settings-span-2">Boodschap<textarea id="admin-site-status-message" rows="3" placeholder="Korte statusboodschap voor de site"></textarea></label>
+                <label class="admin-settings-span-2">CTA link<input id="admin-site-status-cta-link" type="text" placeholder="bijvoorbeeld nieuws.html of https://..." /></label>
+              </div>
+              <div id="admin-site-status-preview" class="admin-status-preview" data-tone="info">
+                <strong id="admin-site-status-preview-title">Nog geen actieve statusbanner.</strong>
+                <p id="admin-site-status-preview-message">Zodra je de status inschakelt, verschijnt hier een live preview.</p>
+              </div>
+              <div class="admin-upload-card">
+                <div>
+                  <h4>Beeld uploaden</h4>
+                  <p>Upload een JPG, PNG, WEBP of GIF en gebruik de teruggegeven URL in nieuws, mixen of programmaslides.</p>
+                </div>
+                <div class="admin-upload-actions">
+                  <input id="admin-upload-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+                  <button id="admin-upload-button" class="btn btn-small btn-ghost" type="button">Upload beeld</button>
+                </div>
+                <p id="admin-upload-feedback" class="contact-feedback"></p>
+                <label>Nieuwe bestands-URL
+                  <input id="admin-upload-result" type="text" readonly value="" />
+                </label>
+              </div>
+            </section>
+
+            <section id="admin-panel-history-kinds" class="admin-panel" role="tabpanel" aria-labelledby="admin-tab-history-kinds" hidden>
+              <h3>History filters</h3>
+              <p>Bepaal hoe tracks automatisch als nieuws, weer, verkeer of promo gelabeld worden.</p>
+              <div class="admin-history-preview">
+                <div class="admin-history-preview-fields">
+                  <label for="admin-history-preview-artist">Test artiest
+                    <input id="admin-history-preview-artist" type="text" placeholder="Bijvoorbeeld RADIO ACCENT" />
+                  </label>
+                  <label for="admin-history-preview-title">Test titel
+                    <input id="admin-history-preview-title" type="text" placeholder="Bijvoorbeeld NIEUWS - 12.03.2026" />
+                  </label>
+                </div>
+                <div id="admin-history-preview-result" class="admin-history-preview-result" data-tone="info">
+                  <p id="admin-history-preview-match">Nog geen history match gecontroleerd.</p>
+                  <p id="admin-history-preview-keywords" class="admin-history-preview-meta"></p>
+                </div>
+              </div>
+              <div id="admin-history-kinds-list" class="admin-list"></div>
+            </section>
+
+            <section id="admin-panel-keywords" class="admin-panel" role="tabpanel" aria-labelledby="admin-tab-keywords" hidden>
+              <h3>Keyword covers</h3>
+              <p>Gebruik komma's tussen meerdere keywords. Zodra artiest of titel een keyword bevat, wordt deze cover gebruikt.</p>
+              <div class="admin-keyword-preview">
+                <div class="admin-keyword-preview-fields">
+                  <label for="admin-keyword-preview-artist">Test artiest
+                    <input id="admin-keyword-preview-artist" type="text" placeholder="Bijvoorbeeld RADIO ACCENT" />
+                  </label>
+                  <label for="admin-keyword-preview-title">Test titel
+                    <input id="admin-keyword-preview-title" type="text" placeholder="Bijvoorbeeld NIEUWS - 12.03.2026" />
+                  </label>
+                </div>
+                <div class="admin-keyword-preview-card">
+                  <img id="admin-keyword-preview-image" src="assets/logo_dab.png" alt="Preview van de keyword cover" loading="lazy" />
+                  <div id="admin-keyword-preview-copy" class="admin-keyword-preview-copy" data-tone="info">
+                    <p id="admin-keyword-preview-match">Nog geen match gecontroleerd.</p>
+                    <p id="admin-keyword-preview-keywords" class="admin-keyword-preview-meta"></p>
+                  </div>
+                </div>
+              </div>
+              <div id="admin-keyword-covers-list" class="admin-list"></div>
+            </section>
+
+            <section id="admin-panel-inbox" class="admin-panel" role="tabpanel" aria-labelledby="admin-tab-inbox" hidden>
+              <div class="admin-monitor-head">
+                <div>
+                  <h3>Contact inbox</h3>
+                  <p id="admin-inbox-summary" class="admin-monitor-updated">Inbox nog niet geladen.</p>
+                </div>
+                <div class="admin-inline-actions">
+                  <button id="admin-inbox-refresh" class="btn btn-small btn-ghost" type="button">Ververs inbox</button>
+                  <a id="admin-inbox-export" class="btn btn-small btn-ghost" href="api/contact-inbox.php?format=csv">Exporteer CSV</a>
+                </div>
+              </div>
+              <div class="admin-filter-bar">
+                <label>Zoek
+                  <input id="admin-inbox-search" type="search" placeholder="Zoek op naam, e-mail of bericht" />
+                </label>
+                <label>Status
+                  <select id="admin-inbox-status-filter">
+                    <option value="all">Alle statussen</option>
+                    <option value="new">Nieuw</option>
+                    <option value="in_progress">In behandeling</option>
+                    <option value="done">Afgerond</option>
+                    <option value="archived">Gearchiveerd</option>
+                  </select>
+                </label>
+                <label>Maand
+                  <select id="admin-inbox-month-filter">
+                    <option value="">Alle maanden</option>
+                  </select>
+                </label>
+              </div>
+              <div id="admin-inbox-list" class="admin-list"></div>
+            </section>
+
+            <section id="admin-panel-backups" class="admin-panel" role="tabpanel" aria-labelledby="admin-tab-backups" hidden>
+              <div class="admin-monitor-head">
+                <div>
+                  <h3>Backuphistoriek</h3>
+                  <p id="admin-backups-summary" class="admin-monitor-updated">Backups worden geladen wanneer je deze tab opent.</p>
+                </div>
+                <button id="admin-backups-refresh" class="btn btn-small btn-ghost" type="button">Ververs backups</button>
+              </div>
+              <div id="admin-backups-list" class="admin-list"></div>
+            </section>
+
+            <section id="admin-panel-monitor" class="admin-panel" role="tabpanel" aria-labelledby="admin-tab-monitor" hidden>
+              <div class="admin-monitor-head">
+                <div>
+                  <h3>Gezondheid en statistieken</h3>
+                  <p id="admin-health-updated" class="admin-monitor-updated">Nog geen controle uitgevoerd.</p>
+                </div>
+                <button id="admin-health-refresh" class="btn btn-small btn-ghost" type="button">Ververs checks</button>
+              </div>
+              <div class="admin-kpi-grid">
+                <article id="admin-kpi-mix-feed" class="admin-kpi-card" data-status="info">
+                  <p class="admin-kpi-label">Mix feed refresh</p>
+                  <strong id="admin-kpi-mix-feed-value">Nog niet geladen</strong>
+                  <p id="admin-kpi-mix-feed-detail" class="admin-kpi-detail">De laatste feed-update verschijnt hier.</p>
+                </article>
+                <article id="admin-kpi-now-playing" class="admin-kpi-card" data-status="info">
+                  <p class="admin-kpi-label">Now playing update</p>
+                  <strong id="admin-kpi-now-playing-value">Nog niet geladen</strong>
+                  <p id="admin-kpi-now-playing-detail" class="admin-kpi-detail">De laatste metadata-update verschijnt hier.</p>
+                </article>
+                <article id="admin-kpi-inbox-open" class="admin-kpi-card" data-status="info">
+                  <p class="admin-kpi-label">Open inbox</p>
+                  <strong id="admin-kpi-inbox-open-value">Nog niet geladen</strong>
+                  <p id="admin-kpi-inbox-open-detail" class="admin-kpi-detail">Nieuwe en lopende inboxberichten verschijnen hier.</p>
+                </article>
+              </div>
+              <div class="admin-monitor-grid">
+                <section class="admin-monitor-card">
+                  <h4>Systeemchecks</h4>
+                  <div id="admin-health-summary" class="admin-health-summary">Checks laden...</div>
+                  <div id="admin-health-list" class="admin-health-list"></div>
+                </section>
+                <section class="admin-monitor-card">
+                  <h4>Playlist statistieken</h4>
+                  <p id="admin-stats-summary" class="admin-stats-summary">Statistieken laden...</p>
+                  <div id="admin-stats-kinds" class="admin-stats-kinds"></div>
+                  <div id="admin-stats-top-artists" class="admin-stats-top-artists"></div>
+                </section>
+                <section class="admin-monitor-card">
+                  <h4>Site analytics</h4>
+                  <p id="admin-analytics-summary" class="admin-stats-summary">Analytics laden...</p>
+                  <div id="admin-analytics-pages" class="admin-stats-top-artists"></div>
+                  <div id="admin-analytics-events" class="admin-stats-top-artists"></div>
+                </section>
+              </div>
+            </section>
+
+            <div class="admin-toolbar">
+              <button id="admin-save" class="btn" type="button">Opslaan</button>
+              <button id="admin-reset" class="btn btn-small btn-ghost" type="button">Reset naar standaard</button>
+              <button id="admin-logout" class="btn btn-small btn-ghost" type="button">Log uit</button>
+              <button id="admin-export" class="btn btn-small btn-ghost" type="button">Exporteer JSON</button>
+              <label class="btn btn-small btn-ghost" for="admin-import-file">Importeer JSON</label>
+              <input id="admin-import-file" type="file" accept="application/json" hidden />
+            </div>
+
+            <p id="admin-feedback" class="contact-feedback"></p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div><h2 data-station-name>Radio Accent</h2><p>Jouw stem in de streek, 24/7.</p><p class="footer-mini-links"><a href="privacy.html">Privacybeleid</a></p></div>
+        <div><h3>Contact</h3><p data-contact-email>info@radioaccent.be</p></div>
+        <div><h3>Bezoek</h3><p data-contact-address1>Bookmolenstraat 7</p><p data-contact-address2>9230 Wetteren</p></div>
+      </div>
+    </footer>
+
+    <script src="config.js?v=20260330b"></script>
+    <script src="script.js?v=20260330b"></script>
+  </body>
+</html>
+

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-labelledby="title desc">
+  <title id="title">Weericoon wolk</title>
+  <desc id="desc">Gestileerd weericoon met zon en wolk</desc>
+  <defs>
+    <linearGradient id="sunGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5ef78"/>
+      <stop offset="100%" stop-color="#e6c739"/>
+    </linearGradient>
+    <linearGradient id="cloudFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#d8e7fb"/>
+    </linearGradient>
+  </defs>
+  <rect width="120" height="120" rx="24" fill="none"/>
+  <circle cx="42" cy="38" r="22" fill="url(#sunGlow)"/>
+  <g stroke="#2d5f9f" stroke-width="4" stroke-linecap="round">
+    <line x1="42" y1="6" x2="42" y2="16"/>
+    <line x1="42" y1="60" x2="42" y2="70"/>
+    <line x1="10" y1="38" x2="20" y2="38"/>
+    <line x1="64" y1="38" x2="74" y2="38"/>
+    <line x1="19" y1="15" x2="27" y2="23"/>
+    <line x1="57" y1="53" x2="65" y2="61"/>
+    <line x1="19" y1="61" x2="27" y2="53"/>
+    <line x1="57" y1="23" x2="65" y2="15"/>
+  </g>
+  <path d="M86 86c11.05 0 20-8.95 20-20s-8.95-20-20-20c-2.43 0-4.76.43-6.92 1.23C74.9 36.44 64.51 30 52.62 30 36.82 30 24 42.82 24 58.62 24 59.09 24.01 59.54 24.03 60 15.08 61.34 8 69.06 8 78.38 8 88.64 16.36 97 26.62 97H86c6.08 0 11-4.92 11-11s-4.92-11-11-11Z" fill="url(#cloudFill)" stroke="#2d5f9f" stroke-width="4"/>
+</svg>
