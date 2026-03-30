@@ -35,7 +35,7 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Teko:wght@500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260331a" />
+    <link rel="stylesheet" href="styles.css?v=20260331b" />
   </head>
   <body>
     <header class="site-header">
@@ -64,7 +64,7 @@
     </header>
 
     <main>
-      <section class="hero" id="live">
+      <section class="hero hero-live" id="live">
         <div class="container">
           <h1 class="sr-only">Radio Accent: live radio, nieuws en playlist</h1>
 
@@ -86,9 +86,14 @@
                 alt="Cover van wat nu speelt op Radio Accent"
               />
               <div class="live-hero-copy">
-                <p id="live-cover-kicker" class="live-cover-kicker">Wat speelt er nu</p>
+                <p id="live-cover-kicker" class="live-cover-kicker">Live op Radio Accent</p>
                 <h2 id="live-track-title" class="live-hero-track">Trackinfo laadt...</h2>
                 <p id="live-cover-caption" class="live-hero-artist">Artiestinformatie laadt...</p>
+                <div class="live-program-inline">
+                  <p class="live-inline-label">Programma</p>
+                  <p id="live-program-current" class="live-hero-program-title">Programma-info laadt...</p>
+                  <p id="live-program-meta" class="live-program-meta">Presentator laadt...</p>
+                </div>
                 <div class="live-show-actions live-show-actions-primary">
                   <a
                     class="btn btn-large"
@@ -105,17 +110,12 @@
             </div>
 
             <div class="live-hero-programming">
-              <div class="live-stack-card live-stack-card-primary">
-                <p class="live-stack-kicker">Huidig programma</p>
-                <p id="live-program-current" class="live-hero-program-title">Programma-info laadt...</p>
-                <p id="live-program-meta" class="live-program-meta">Presentator laadt...</p>
-              </div>
-              <div class="live-mini-grid">
-                <div class="live-stack-card live-next-card">
+              <div class="live-hero-meta-band">
+                <div class="live-hero-meta-item live-next-card">
                   <p class="live-stack-kicker">Hierna</p>
                   <p id="live-program-next" class="live-program-line">Programma-info laadt...</p>
                 </div>
-                <div id="live-cover-panel" class="live-stack-card live-track-card">
+                <div id="live-cover-panel" class="live-hero-meta-item live-track-card">
                   <div class="live-next-track-row">
                     <img
                       id="live-next-cover"
