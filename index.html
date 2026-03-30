@@ -35,7 +35,7 @@
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Teko:wght@500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="styles.css?v=20260330b" />
+    <link rel="stylesheet" href="styles.css?v=20260331a" />
   </head>
   <body>
     <header class="site-header">
@@ -65,83 +65,72 @@
 
     <main>
       <section class="hero" id="live">
-        <div class="container hero-grid">
+        <div class="container">
           <h1 class="sr-only">Radio Accent: live radio, nieuws en playlist</h1>
 
-          <div id="home-promo-strip" class="home-promo" aria-live="polite">
-            <div class="home-promo-shell">
-              <div class="home-promo-copy">
-                <p class="section-label">Laatste nieuws</p>
-                <h2>Nieuws en highlights laden...</h2>
-                <p class="home-promo-text">Even geduld, we vullen dit meteen aan.</p>
-                <p class="meta-updated">Actuele updates van Radio Accent</p>
-              </div>
-              <div class="home-promo-actions">
-                <a class="btn home-promo-cta" href="contact.html?topic=request-tip&source=homepage">Stuur een tip</a>
-              </div>
-            </div>
-          </div>
-
-          <aside class="live-show-card" aria-label="Nu op antenne">
+          <aside class="live-show-card live-show-card-primary" aria-label="Nu op antenne">
             <div class="live-show-head">
               <div class="live-show-status">
                 <span class="live-state-dot" aria-hidden="true"></span>
-                <p class="live-state">Live</p>
+                <p class="live-state">Nu op antenne</p>
                 <p id="live-program-slot" class="live-show-slot">--:-- - --:--</p>
               </div>
               <p id="live-updated-label" class="live-updated-label">Laatste update wordt geladen...</p>
             </div>
 
-            <div class="live-show-main" aria-live="polite">
-              <h2 id="live-program-current" class="live-show-title">Programma-info laadt...</h2>
-              <p id="live-program-meta" class="live-program-meta">Presentator laadt...</p>
-            </div>
-
-            <div id="live-cover-panel" class="live-stack-card live-track-card">
-              <div class="live-track-row">
-                <img
-                  id="dab-slide-image"
-                  class="dab-slide-image live-track-cover"
-                  src="assets/logo_dab.png"
-                  alt="Cover van de huidige track op Radio Accent"
-                />
-                <div class="live-track-copy">
-                  <p id="live-cover-kicker" class="live-cover-kicker">Now playing</p>
-                  <p id="live-track-title" class="live-current-track">Trackinfo laadt...</p>
-                  <p id="live-cover-caption" class="live-cover-caption">Artiestinformatie laadt...</p>
+            <div class="live-hero-main" aria-live="polite">
+              <img
+                id="dab-slide-image"
+                class="dab-slide-image live-hero-cover"
+                src="assets/logo_dab.png"
+                alt="Cover van wat nu speelt op Radio Accent"
+              />
+              <div class="live-hero-copy">
+                <p id="live-cover-kicker" class="live-cover-kicker">Wat speelt er nu</p>
+                <h2 id="live-track-title" class="live-hero-track">Trackinfo laadt...</h2>
+                <p id="live-cover-caption" class="live-hero-artist">Artiestinformatie laadt...</p>
+                <div class="live-show-actions live-show-actions-primary">
+                  <a
+                    class="btn btn-large"
+                    data-stream-link
+                    href="https://clubfmserver.be/accentdab.mp3"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    Luister live
+                  </a>
+                  <a class="btn btn-small btn-ghost" href="playlist.html">Bekijk playlist</a>
                 </div>
               </div>
             </div>
 
-            <div class="live-stack-card live-next-card">
-              <p class="live-stack-kicker">Hierna</p>
-              <p id="live-program-next" class="live-program-line">Programma-info laadt...</p>
-              <div class="live-next-track-row">
-                <img
-                  id="live-next-cover"
-                  class="dab-slide-image live-next-cover"
-                  src="assets/logo_dab.png"
-                  alt="Cover van de volgende plaat op Radio Accent"
-                />
-                <div class="live-next-track-copy">
-                  <p class="live-next-subhead">Volgende plaat</p>
-                  <p id="live-track-next" class="live-program-line live-program-line-muted">Info laadt...</p>
-                  <p id="live-track-next-artist" class="live-cover-caption">Artiestinfo laadt...</p>
+            <div class="live-hero-programming">
+              <div class="live-stack-card live-stack-card-primary">
+                <p class="live-stack-kicker">Huidig programma</p>
+                <p id="live-program-current" class="live-hero-program-title">Programma-info laadt...</p>
+                <p id="live-program-meta" class="live-program-meta">Presentator laadt...</p>
+              </div>
+              <div class="live-mini-grid">
+                <div class="live-stack-card live-next-card">
+                  <p class="live-stack-kicker">Hierna</p>
+                  <p id="live-program-next" class="live-program-line">Programma-info laadt...</p>
+                </div>
+                <div id="live-cover-panel" class="live-stack-card live-track-card">
+                  <div class="live-next-track-row">
+                    <img
+                      id="live-next-cover"
+                      class="dab-slide-image live-next-cover"
+                      src="assets/logo_dab.png"
+                      alt="Cover van de volgende plaat op Radio Accent"
+                    />
+                    <div class="live-next-track-copy">
+                      <p class="live-next-subhead">Volgende track</p>
+                      <p id="live-track-next" class="live-program-line live-program-line-muted">Info laadt...</p>
+                      <p id="live-track-next-artist" class="live-cover-caption">Artiestinfo laadt...</p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div class="live-show-actions">
-              <a class="btn btn-small btn-ghost" href="playlist.html">Open playlist</a>
-              <a
-                class="btn btn-small"
-                data-stream-link
-                href="https://clubfmserver.be/accentdab.mp3"
-                target="_blank"
-                rel="noopener"
-              >
-                Luister live
-              </a>
             </div>
           </aside>
         </div>
@@ -149,12 +138,26 @@
 
       <section class="section">
         <div class="container">
-          <div class="section-head section-head-inline">
+          <div class="section-head section-head-inline section-head-mobile-stack">
+            <div>
+              <p class="section-label">Vandaag en straks</p>
+              <h2>Wat hoor je vandaag op Radio Accent?</h2>
+            </div>
+            <a class="btn btn-small btn-ghost" href="programmas.html">Volledige weekplanning</a>
+          </div>
+          <div id="home-schedule-grid" class="program-grid"></div>
+        </div>
+      </section>
+
+      <section class="section section-soft">
+        <div class="container">
+          <div class="section-head section-head-inline section-head-mobile-stack">
             <div>
               <p class="section-label">Muziek</p>
               <h2>Laatst gespeeld op Accent</h2>
             </div>
             <div class="carousel-controls">
+              <a class="btn btn-small btn-ghost" href="playlist.html">Naar playlist</a>
               <button id="last-played-prev" class="btn btn-small btn-ghost" type="button" aria-label="Vorige">
                 Vorige
               </button>
@@ -169,25 +172,42 @@
 
       <section class="section">
         <div class="container">
-          <div class="section-head">
-            <p class="section-label">Programma's</p>
-            <h2>Vandaag op Radio Accent</h2>
+          <div class="section-head section-head-inline section-head-mobile-stack">
+            <div>
+              <p class="section-label">Avondmixen</p>
+              <h2>Mixen en highlights om meteen op te zetten</h2>
+            </div>
+            <a class="btn btn-small btn-ghost" href="mixen.html">Bekijk alle mixen</a>
           </div>
-
-          <div id="home-schedule-grid" class="program-grid"></div>
+          <div class="home-mix-showcase">
+            <div id="home-featured-mix" class="home-featured-mix"></div>
+            <div id="home-mixes-list" class="mix-grid home-mix-grid"></div>
+          </div>
         </div>
       </section>
 
       <section class="section section-soft">
         <div class="container">
-          <div class="section-head section-head-inline">
+          <div class="section-head section-head-inline section-head-mobile-stack">
             <div>
-              <p class="section-label">Avondmixen</p>
-              <h2>Beluister de wekelijkse mixprogramma's</h2>
+              <p class="section-label">Uit de regio</p>
+              <h2>Compacte highlights, zonder de liveflow te verdringen</h2>
             </div>
-            <a class="btn btn-small btn-ghost" href="mixen.html">Bekijk alle mixen</a>
+            <a class="btn btn-small btn-ghost" href="nieuws.html">Meer nieuws</a>
           </div>
-          <div id="home-mixes-list" class="mix-grid"></div>
+          <div id="home-promo-strip" class="home-promo home-promo-secondary" aria-live="polite">
+            <div class="home-promo-shell">
+              <div class="home-promo-copy">
+                <p class="section-label">Laatste nieuws</p>
+                <h2>Nieuws en highlights laden...</h2>
+                <p class="home-promo-text">Even geduld, we vullen dit meteen aan.</p>
+                <p class="meta-updated">Actuele updates van Radio Accent</p>
+              </div>
+              <div class="home-promo-actions">
+                <a class="btn home-promo-cta" href="contact.html?topic=request-tip&source=homepage">Stuur een tip</a>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -221,8 +241,8 @@
       </div>
     </footer>
 
-    <script src="config.js?v=20260330b"></script>
-    <script src="script.js?v=20260330b"></script>
+    <script src="config.js?v=20260331a"></script>
+    <script src="script.js?v=20260331a"></script>
   </body>
 </html>
 

@@ -1,0 +1,63 @@
+{
+    "generatedAt": "2026-03-30T21:46:22+00:00",
+    "title": "Vandaag op Radio Accent",
+    "dayLabel": "maandag 30 maart",
+    "currentIndex": 5,
+    "nextIndex": 0,
+    "items": [
+        {
+            "time": "06:00 - 07:00",
+            "title": "Accent Start",
+            "description": "Kalm ontwaken met zachte hits en headlines.",
+            "host": "",
+            "image": "",
+            "isCurrent": false,
+            "isNext": true
+        },
+        {
+            "time": "07:00 - 10:00",
+            "title": "Accent Ochtend",
+            "description": "Nieuws, verkeer en energieke muziek voor je dagstart.",
+            "host": "",
+            "image": "",
+            "isCurrent": false,
+            "isNext": false
+        },
+        {
+            "time": "10:00 - 13:00",
+            "title": "Accent Werkdag",
+            "description": "Feelgood tracks en updates uit de regio.",
+            "host": "",
+            "image": "",
+            "isCurrent": false,
+            "isNext": false
+        },
+        {
+            "time": "13:00 - 16:00",
+            "title": "Accent Middag",
+            "description": "De ideale mix voor je namiddag op kantoor of thuis.",
+            "host": "",
+            "image": "",
+            "isCurrent": false,
+            "isNext": false
+        },
+        {
+            "time": "16:00 - 19:00",
+            "title": "Accent Drive",
+            "description": "De rit naar huis met verkeer, nieuws en requests.",
+            "host": "",
+            "image": "",
+            "isCurrent": false,
+            "isNext": false
+        },
+        {
+            "time": "20:00 - 22:00",
+            "title": "Accent Avondmix",
+            "description": "Rustige opbouw met moderne klassiekers.",
+            "host": "",
+            "image": "",
+            "isCurrent": true,
+            "isNext": false
+        }
+    ]
+}

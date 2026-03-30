@@ -1,0 +1,30 @@
+{
+    "generatedAt": "2026-03-30T21:46:22+00:00",
+    "title": "Weekendtips",
+    "items": [
+        {
+            "title": "Vrijdagavondmix om te bewaren",
+            "excerpt": "De donderdag warming-up voor het weekend!",
+            "meta": "Elke donderdag avond tussen 22 en 23 uur",
+            "linkLabel": "Open mixen",
+            "linkUrl": "mixen.html",
+            "image": ""
+        },
+        {
+            "title": "Start je weekend met de nieuwste avondmix",
+            "excerpt": "Vrijdagavond staat de recentste mix klaar om live of on demand te beluisteren.",
+            "meta": "Vrijdagavond",
+            "linkLabel": "Beluister mixen",
+            "linkUrl": "mixen.html",
+            "image": "assets/promo-cover.jpg"
+        },
+        {
+            "title": "Gebruik de playlist om nieuwe favorieten terug te vinden",
+            "excerpt": "Heb je een track gehoord onderweg? De playlist geeft je snel het juiste nummer terug.",
+            "meta": "Muziektip",
+            "linkLabel": "Open playlist",
+            "linkUrl": "playlist.html",
+            "image": "assets/cover.jpg"
+        }
+    ]
+}

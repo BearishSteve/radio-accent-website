@@ -1,5 +1,12 @@
 const config = window.RADIO_ACCENT_CONFIG || {};
 const playlistHistoryApi = String(config.playlistHistoryApi || '').trim();
+const homepageBlocksApi = String(config.homepage?.blocksEndpoint || 'api/data/homepage_blocks.json').trim();
+const homepageState = window.__RADIO_ACCENT_HOMEPAGE_STATE || {
+  blocks: null,
+  pending: null,
+  refreshTimer: null
+};
+window.__RADIO_ACCENT_HOMEPAGE_STATE = homepageState;
 const pwaState = window.__RADIO_ACCENT_PWA || {
   deferredPrompt: null,
   installed: false,
@@ -1395,10 +1402,10 @@ const renderLastPlayed = (tracks) => {
   list.innerHTML = safeTracks.slice(0, 20).map((track) => `
     <article class="last-played-item">
       <img class="last-played-art" src="${escapeHtml(sanitizeMediaUrl(track.image, { fallback: fallbackImage }))}" alt="${escapeHtml(`${track.artist} - ${track.title}`)}" loading="lazy" />
-      <span class="last-played-badge">${escapeHtml(track.time || '--:--')}</span>
       <div class="last-played-content">
-        <h3>${escapeHtml(track.artist)}</h3>
-        <p>${escapeHtml(track.title)}</p>
+        <span class="last-played-badge">${escapeHtml(track.time || '--:--')}</span>
+        <h3>${escapeHtml(track.title || 'Onbekende track')}</h3>
+        <p>${escapeHtml(track.artist || config.stationName || 'Radio Accent')}</p>
       </div>
     </article>
   `).join('');
@@ -2301,12 +2308,38 @@ const cmsDefaults = {
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 
+const WEEKDAY_OPTIONS = [
+  { value: 'maandag', label: 'Ma' },
+  { value: 'dinsdag', label: 'Di' },
+  { value: 'woensdag', label: 'Wo' },
+  { value: 'donderdag', label: 'Do' },
+  { value: 'vrijdag', label: 'Vr' },
+  { value: 'zaterdag', label: 'Za' },
+  { value: 'zondag', label: 'Zo' }
+];
+
+const normalizeScheduleDays = (value) => {
+  const rawItems = Array.isArray(value)
+    ? value
+    : String(value || '')
+      .split(',')
+      .map((item) => item.trim());
+
+  const allowed = new Set(WEEKDAY_OPTIONS.map((item) => item.value));
+  const normalized = rawItems
+    .map((item) => normalizeNeedle(item))
+    .filter((item) => allowed.has(item));
+
+  return [...new Set(normalized)];
+};
+
 const normalizeScheduleItem = (item) => ({
   time: String(item?.time || '').trim(),
   title: String(item?.title || '').trim(),
   description: String(item?.description || '').trim(),
   host: String(item?.host || '').trim(),
-  image: String(item?.image || '').trim()
+  image: String(item?.image || '').trim(),
+  days: normalizeScheduleDays(item?.days)
 });
 
 const normalizeMixReplays = (value) => {
@@ -2891,15 +2924,390 @@ const trackAnalyticsEvent = (name, label, meta = {}) => {
   }).catch(() => {});
 };
 
+const hasHomepageDataTargets = () => Boolean(
+  document.getElementById('home-promo-strip')
+  || document.getElementById('home-schedule-grid')
+  || document.getElementById('home-featured-mix')
+  || document.getElementById('homepage-discovery-grid')
+);
+
+const normalizeHomepageStoryItem = (item, fallbackImage) => {
+  if (!item || typeof item !== 'object') return null;
+  const title = String(item.title || '').trim();
+  const excerpt = String(item.excerpt || item.text || item.description || '').trim();
+  if (!title || !excerpt) return null;
+  return {
+    title,
+    excerpt,
+    meta: String(item.meta || item.date || item.kicker || '').trim(),
+    linkLabel: String(item.linkLabel || item.ctaLabel || 'Meer info').trim(),
+    linkUrl: String(item.linkUrl || item.ctaLink || 'index.html').trim(),
+    image: sanitizeMediaUrl(item.image || '', { fallback: fallbackImage })
+  };
+};
+
+const normalizeHomepageScheduleItem = (item) => {
+  if (!item || typeof item !== 'object') return null;
+  const time = String(item.time || '').trim();
+  const title = String(item.title || '').trim();
+  if (!time || !title) return null;
+  return {
+    time,
+    title,
+    description: String(item.description || '').trim(),
+    host: String(item.host || '').trim(),
+    image: String(item.image || '').trim(),
+    days: normalizeScheduleDays(item.days)
+  };
+};
+
+const normalizeHomepageBlocksPayload = (payload) => {
+  if (!payload || typeof payload !== 'object') return null;
+  const fallbackImage = sanitizeMediaUrl(config.defaultDabSlide || 'assets/logo_dab.png', { fallback: 'assets/logo_dab.png' });
+  const todayItems = Array.isArray(payload.todaySchedule?.items)
+    ? payload.todaySchedule.items.map(normalizeHomepageScheduleItem).filter(Boolean)
+    : [];
+  const regionItems = Array.isArray(payload.regionNews?.items)
+    ? payload.regionNews.items.map((item) => normalizeHomepageStoryItem(item, fallbackImage)).filter(Boolean)
+    : [];
+  const weekendItems = Array.isArray(payload.weekendTips?.items)
+    ? payload.weekendTips.items.map((item) => normalizeHomepageStoryItem(item, fallbackImage)).filter(Boolean)
+    : [];
+  const latestMix = payload.latestMix && typeof payload.latestMix === 'object'
+    ? {
+      title: String(payload.latestMix.title || '').trim(),
+      dj: String(payload.latestMix.dj || '').trim(),
+      schedule: String(payload.latestMix.schedule || '').trim(),
+      description: String(payload.latestMix.description || '').trim(),
+      streamUrl: String(payload.latestMix.streamUrl || '').trim(),
+      cover: sanitizeMediaUrl(payload.latestMix.cover || '', { fallback: fallbackImage }),
+      updatedAt: String(payload.latestMix.updatedAt || '').trim(),
+      slug: String(payload.latestMix.slug || '').trim(),
+      linkLabel: String(payload.latestMix.linkLabel || 'Open mixen').trim(),
+      linkUrl: String(payload.latestMix.linkUrl || 'mixen.html').trim()
+    }
+    : null;
+
+  return {
+    generatedAt: String(payload.generatedAt || '').trim(),
+    onAir: payload.onAir && typeof payload.onAir === 'object' ? {
+      title: String(payload.onAir.title || 'Nu op antenne').trim(),
+      showTitle: String(payload.onAir.showTitle || '').trim(),
+      slot: String(payload.onAir.slot || '').trim(),
+      description: String(payload.onAir.description || '').trim(),
+      host: String(payload.onAir.host || '').trim(),
+      trackTitle: String(payload.onAir.trackTitle || '').trim(),
+      trackArtist: String(payload.onAir.trackArtist || '').trim(),
+      cover: sanitizeMediaUrl(payload.onAir.cover || '', { fallback: fallbackImage }),
+      linkLabel: String(payload.onAir.linkLabel || 'Luister live').trim(),
+      linkUrl: String(payload.onAir.linkUrl || getDefaultLiveStreamUrl() || '#').trim()
+    } : null,
+    todaySchedule: {
+      title: String(payload.todaySchedule?.title || 'Vandaag op Radio Accent').trim(),
+      dayLabel: String(payload.todaySchedule?.dayLabel || '').trim(),
+      items: todayItems
+    },
+    regionNews: {
+      title: String(payload.regionNews?.title || 'Uit de regio').trim(),
+      items: regionItems
+    },
+    weekendTips: {
+      title: String(payload.weekendTips?.title || 'Weekendtips').trim(),
+      items: weekendItems
+    },
+    latestMix
+  };
+};
+
+const getHomepageBlocks = () => homepageState.blocks;
+
+const buildFallbackWeekendTips = () => {
+  const fallbackImage = sanitizeMediaUrl(config.defaultDabSlide || 'assets/logo_dab.png', { fallback: 'assets/logo_dab.png' });
+  const latestMix = getLatestMixItem();
+  const tips = [];
+
+  if (latestMix) {
+    tips.push({
+      title: 'Vrijdagavondmix om te bewaren',
+      excerpt: latestMix.description || latestMix.title || 'De nieuwste mix staat klaar om te beluisteren.',
+      meta: latestMix.schedule || 'Weekendmix',
+      linkLabel: 'Open mixen',
+      linkUrl: 'mixen.html',
+      image: sanitizeMediaUrl(latestMix.cover || '', { fallback: fallbackImage })
+    });
+  }
+
+  tips.push({
+    title: 'Gebruik de playlist voor je weekendtracks',
+    excerpt: 'Zoek snel terug welk nummer je net hoorde en bouw je eigen Accent-weekendlijst op.',
+    meta: 'Muziektip',
+    linkLabel: 'Open playlist',
+    linkUrl: 'playlist.html',
+    image: fallbackImage
+  });
+
+  tips.push({
+    title: 'Deel je lokale weekendtip met de redactie',
+    excerpt: 'Stuur ons een evenement, actie of omleiding uit de streek en we nemen het mee in onze updates.',
+    meta: 'Samen met de regio',
+    linkLabel: 'Contacteer ons',
+    linkUrl: 'contact.html?topic=request-tip&source=weekendtips',
+    image: fallbackImage
+  });
+
+  return tips.slice(0, 3);
+};
+
+const getResolvedHomepageBlocks = () => {
+  const fallbackImage = sanitizeMediaUrl(config.defaultDabSlide || 'assets/logo_dab.png', { fallback: 'assets/logo_dab.png' });
+  const storedBlocks = getHomepageBlocks() || {};
+  const scheduleSource = Array.isArray(storedBlocks.todaySchedule?.items) && storedBlocks.todaySchedule.items.length
+    ? storedBlocks.todaySchedule.items
+    : (Array.isArray(getCmsData().schedule) ? getCmsData().schedule : []);
+  const normalizedSchedule = scheduleSource.map(normalizeHomepageScheduleItem).filter(Boolean);
+  const scheduleSnapshot = getScheduleSnapshot(normalizedSchedule);
+  const scheduleItems = normalizedSchedule.map((item, index) => ({
+    ...item,
+    isCurrent: scheduleSnapshot.currentIndex === index,
+    isNext: scheduleSnapshot.nextIndex === index
+  }));
+
+  const regionNewsItems = Array.isArray(storedBlocks.regionNews?.items) && storedBlocks.regionNews.items.length
+    ? storedBlocks.regionNews.items
+    : getSortedNewsItems().slice(0, 3).map((item) => ({
+      title: item.title || 'Regionieuws',
+      excerpt: item.excerpt || 'Lees de laatste update uit de regio.',
+      meta: formatNewsDateLabel(item.date || '') || 'Actuele update',
+      linkLabel: item.linkLabel || 'Lees meer',
+      linkUrl: item.linkUrl || 'nieuws.html',
+      image: sanitizeMediaUrl(item.image || '', { fallback: fallbackImage })
+    }));
+
+  const weekendTipsItems = Array.isArray(storedBlocks.weekendTips?.items) && storedBlocks.weekendTips.items.length
+    ? storedBlocks.weekendTips.items
+    : buildFallbackWeekendTips();
+
+  const latestMix = storedBlocks.latestMix?.title
+    ? storedBlocks.latestMix
+    : getLatestMixItem();
+  const currentShow = scheduleSnapshot.current;
+  const onAirSource = storedBlocks.onAir || {};
+
+  return {
+    generatedAt: storedBlocks.generatedAt || new Date().toISOString(),
+    onAir: {
+      title: onAirSource.title || 'Nu op antenne',
+      showTitle: currentShow?.title || onAirSource.showTitle || (config.stationName || 'Radio Accent'),
+      slot: currentShow?.time || onAirSource.slot || '',
+      description: currentShow?.description || onAirSource.description || 'Live vanuit Radio Accent.',
+      host: currentShow?.host || onAirSource.host || '',
+      trackTitle: String(livePlayerMeta.title || onAirSource.trackTitle || '').trim(),
+      trackArtist: String(livePlayerMeta.artist || onAirSource.trackArtist || '').trim(),
+      cover: sanitizeMediaUrl(livePlayerMeta.cover || onAirSource.cover || '', { fallback: fallbackImage }),
+      linkLabel: onAirSource.linkLabel || 'Luister live',
+      linkUrl: onAirSource.linkUrl || getDefaultLiveStreamUrl() || '#'
+    },
+    todaySchedule: {
+      title: storedBlocks.todaySchedule?.title || 'Vandaag op Radio Accent',
+      dayLabel: storedBlocks.todaySchedule?.dayLabel || '',
+      items: scheduleItems
+    },
+    regionNews: {
+      title: storedBlocks.regionNews?.title || 'Uit de regio',
+      items: regionNewsItems.slice(0, 3)
+    },
+    weekendTips: {
+      title: storedBlocks.weekendTips?.title || 'Weekendtips',
+      items: weekendTipsItems.slice(0, 3)
+    },
+    latestMix: latestMix ? {
+      title: latestMix.title || 'Nieuwste mix',
+      dj: latestMix.dj || 'Radio Accent',
+      schedule: latestMix.schedule || 'Mixhighlight',
+      description: latestMix.description || 'De nieuwste mix staat klaar om te beluisteren.',
+      streamUrl: latestMix.streamUrl || '',
+      cover: sanitizeMediaUrl(latestMix.cover || '', { fallback: fallbackImage }),
+      updatedAt: latestMix.updatedAt || '',
+      slug: latestMix.slug || '',
+      linkLabel: latestMix.linkLabel || 'Open mixen',
+      linkUrl: latestMix.linkUrl || 'mixen.html'
+    } : null
+  };
+};
+
+const renderHomepageInlineFallback = (title, text) => `
+  <div class="homepage-inline-empty">
+    <strong>${escapeHtml(title)}</strong>
+    <p>${escapeHtml(text)}</p>
+  </div>
+`;
+
+const renderHomepageStoryLinks = (items, emptyTitle, emptyText) => {
+  if (!items.length) {
+    return renderHomepageInlineFallback(emptyTitle, emptyText);
+  }
+
+  return items.map((item) => `
+    <a class="homepage-story" href="${escapeHtml(sanitizeLinkUrl(item.linkUrl || 'index.html'))}">
+      <strong>${escapeHtml(item.title)}</strong>
+      <span>${escapeHtml(item.excerpt || '')}</span>
+      ${item.meta ? `<em>${escapeHtml(item.meta)}</em>` : ''}
+    </a>
+  `).join('');
+};
+
+const renderHomepageDiscoveryGrid = () => {
+  const target = document.getElementById('homepage-discovery-grid');
+  if (!target) return;
+
+  const blocks = getResolvedHomepageBlocks();
+  const onAir = blocks.onAir;
+  const latestMix = blocks.latestMix;
+  const fallbackImage = sanitizeMediaUrl(config.defaultDabSlide || 'assets/logo_dab.png', { fallback: 'assets/logo_dab.png' });
+  const onAirLink = escapeHtml(sanitizeLinkUrl(onAir.linkUrl || getDefaultLiveStreamUrl() || '#'));
+
+  target.innerHTML = `
+    <article class="homepage-panel homepage-panel-onair">
+      <p class="section-label">${escapeHtml(onAir.title || 'Nu op antenne')}</p>
+      <div class="homepage-onair-layout">
+        <img class="homepage-onair-cover" src="${escapeHtml(onAir.cover || fallbackImage)}" alt="${escapeHtml(onAir.trackTitle ? `Cover van ${onAir.trackTitle}` : 'Nu op antenne op Radio Accent')}" loading="lazy" />
+        <div class="homepage-mix-copy">
+          <h3>${escapeHtml(onAir.showTitle || (config.stationName || 'Radio Accent'))}</h3>
+          ${onAir.slot ? `<p class="homepage-panel-meta">${escapeHtml(onAir.slot)}</p>` : ''}
+          <p class="homepage-panel-text">${escapeHtml(onAir.description || 'Live vanuit Radio Accent.')}</p>
+          ${onAir.host ? `<p class="homepage-panel-host">Met ${escapeHtml(onAir.host)}</p>` : ''}
+          ${onAir.trackTitle ? `
+            <div class="homepage-track-chip">
+              <span>Now playing</span>
+              <strong>${escapeHtml(onAir.trackTitle)}</strong>
+              ${onAir.trackArtist ? `<p>${escapeHtml(onAir.trackArtist)}</p>` : ''}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+      <div class="homepage-panel-actions">
+        <a class="btn btn-small" data-stream-link href="${onAirLink}">${escapeHtml(onAir.linkLabel || 'Luister live')}</a>
+      </div>
+    </article>
+
+    <article class="homepage-panel homepage-panel-region">
+      <p class="section-label">${escapeHtml(blocks.regionNews.title || 'Uit de regio')}</p>
+      <h3>Regionieuws en updates</h3>
+      <div class="homepage-story-list">
+        ${renderHomepageStoryLinks(
+          blocks.regionNews.items || [],
+          'Nog geen regionieuws',
+          'Zodra er nieuwe lokale items klaarstaan, verschijnen ze automatisch hier.'
+        )}
+      </div>
+    </article>
+
+    <article class="homepage-panel homepage-panel-weekend">
+      <p class="section-label">${escapeHtml(blocks.weekendTips.title || 'Weekendtips')}</p>
+      <h3>Tips voor luisteraars</h3>
+      <div class="homepage-story-list">
+        ${renderHomepageStoryLinks(
+          blocks.weekendTips.items || [],
+          'Nog geen weekendtips',
+          'Voeg weekendtips toe of laat de generator dit blok automatisch aanvullen.'
+        )}
+      </div>
+    </article>
+
+    <article class="homepage-panel homepage-panel-mix">
+      <p class="section-label">Nieuwste mix</p>
+      ${latestMix ? `
+        <div class="homepage-mix-layout">
+          <img class="homepage-mix-cover" src="${escapeHtml(latestMix.cover || fallbackImage)}" alt="${escapeHtml(latestMix.title || 'Nieuwste mix')}" loading="lazy" />
+          <div class="homepage-mix-copy">
+            <h3>${escapeHtml(latestMix.title || 'Nieuwste mix')}</h3>
+            ${latestMix.schedule ? `<p class="homepage-panel-meta">${escapeHtml(latestMix.schedule)}</p>` : ''}
+            <p class="homepage-panel-text">${escapeHtml(latestMix.description || 'De nieuwste mix staat klaar om te beluisteren.')}</p>
+            ${latestMix.dj ? `<p class="homepage-panel-host">${escapeHtml(latestMix.dj)}</p>` : ''}
+            ${latestMix.updatedAt ? `<p class="meta-updated">${escapeHtml(formatMixUpdatedLabel(latestMix.updatedAt))}</p>` : ''}
+          </div>
+        </div>
+        <div class="homepage-panel-actions">
+          <a class="btn btn-small btn-ghost" href="${escapeHtml(sanitizeLinkUrl(latestMix.linkUrl || 'mixen.html'))}">${escapeHtml(latestMix.linkLabel || 'Open mixen')}</a>
+        </div>
+      ` : renderHomepageInlineFallback(
+        'Nog geen mix beschikbaar',
+        'Voeg een mix toe in de feed of beheerconsole om dit blok automatisch te vullen.'
+      )}
+    </article>
+  `;
+
+  target.querySelectorAll('.homepage-onair-cover, .homepage-mix-cover').forEach((image) => {
+    wireImageFallback(image, fallbackImage);
+  });
+};
+
+const fetchHomepageBlocks = async ({ force = false } = {}) => {
+  if (!homepageBlocksApi || !hasHomepageDataTargets()) return null;
+  if (!force && homepageState.pending) return homepageState.pending;
+
+  homepageState.pending = fetch(`${homepageBlocksApi}?_=${Date.now()}`, { cache: 'no-store' })
+    .then(async (response) => {
+      if (!response.ok) {
+        throw new Error(`Homepage blocks request failed with HTTP ${response.status}`);
+      }
+      const payload = await response.json();
+      const normalized = normalizeHomepageBlocksPayload(payload);
+      if (normalized) {
+        homepageState.blocks = normalized;
+        renderHomePromoStrip();
+        renderHomeSchedule();
+        renderHomeMixShowcase();
+      }
+      return normalized;
+    })
+    .catch((error) => {
+      console.error('Homepage blocks refresh failed.', error);
+      return null;
+    })
+    .finally(() => {
+      homepageState.pending = null;
+    });
+
+  return homepageState.pending;
+};
+
+const startHomepageBlocksRefresh = () => {
+  if (homepageState.refreshTimer || !hasHomepageDataTargets()) return;
+  homepageState.refreshTimer = window.setInterval(() => {
+    void fetchHomepageBlocks({ force: true });
+  }, 300000);
+};
+
 const renderHomeSchedule = () => {
   const target = document.getElementById('home-schedule-grid');
   if (!target) return;
-  const schedule = getCmsData().schedule.slice(0, 4);
-  target.innerHTML = schedule.map((item) => `
-    <article class="program-card">
-      <p>${escapeHtml(item.time)}</p>
+  const blocks = getResolvedHomepageBlocks();
+  const schedule = Array.isArray(blocks.todaySchedule?.items) ? blocks.todaySchedule.items : [];
+  const highlights = getScheduleHighlightCards(schedule);
+  if (!schedule.length) {
+    target.innerHTML = renderEmptyStateCard({
+      title: 'Nog geen programma\'s',
+      text: 'De dagplanning verschijnt hier automatisch zodra er items beschikbaar zijn.',
+      tone: 'info'
+    });
+    return;
+  }
+  target.innerHTML = highlights.map(({ item, kicker }, index) => `
+    <article class="program-card program-card-compact${index === 0 ? ' program-card-featured' : ''}${item.isCurrent ? ' is-live' : ''}${item.isNext ? ' is-next' : ''}">
+      <div class="program-card-top">
+        <p class="program-card-kicker">${escapeHtml(kicker)}</p>
+        <p class="program-card-time">${escapeHtml(item.time)}</p>
+      </div>
       <h3>${escapeHtml(item.title)}</h3>
-      <p>${escapeHtml(item.description || '')}</p>
+      <p>${escapeHtml(item.description || 'Programmablok op Radio Accent.')}</p>
+      ${item.host ? `<p class="schedule-host">Met ${escapeHtml(item.host)}</p>` : ''}
+      ${(item.isCurrent || item.isNext) ? `
+        <div class="schedule-badges">
+          ${item.isCurrent ? '<span class="schedule-badge schedule-badge-live">Nu op antenne</span>' : ''}
+          ${item.isNext ? '<span class="schedule-badge schedule-badge-next">Hierna</span>' : ''}
+        </div>
+      ` : ''}
     </article>
   `).join('');
 };
@@ -2951,6 +3359,172 @@ const getScheduleSnapshot = (items = [], now = new Date()) => {
 
 const getCurrentScheduleItem = (items = [], now = new Date()) => getScheduleSnapshot(items, now).current;
 
+const getScheduleTimeStart = (item) => parseScheduleMinutes(item?.time || '')?.start ?? Number.MAX_SAFE_INTEGER;
+
+const getScheduleHighlightCards = (items = [], { preferLive = true } = {}) => {
+  const safeItems = Array.isArray(items) ? items.filter(Boolean) : [];
+  const snapshot = preferLive
+    ? getScheduleSnapshot(safeItems)
+    : {
+      current: null,
+      next: safeItems[0] || null,
+      currentIndex: -1,
+      nextIndex: safeItems.length ? 0 : -1
+    };
+  const seen = new Set();
+  const cards = [];
+  const pushCard = (item, kicker) => {
+    if (!item) return;
+    const signature = `${item.time || ''}::${item.title || ''}`;
+    if (seen.has(signature)) return;
+    seen.add(signature);
+    cards.push({ item, kicker });
+  };
+
+  if (snapshot.current) {
+    pushCard(snapshot.current, 'Nu op antenne');
+  } else if (snapshot.next) {
+    pushCard(snapshot.next, 'Eerstvolgend');
+  }
+
+  if (snapshot.next && snapshot.next !== snapshot.current) {
+    pushCard(snapshot.next, 'Hierna');
+  }
+
+  const remaining = safeItems.filter((item) => !seen.has(`${item.time || ''}::${item.title || ''}`));
+  const laterShow = remaining[0];
+  if (laterShow) {
+    pushCard(laterShow, cards.length ? 'Later vandaag' : 'Vandaag');
+  }
+
+  const eveningShow = safeItems.find((item) => {
+    const start = getScheduleTimeStart(item);
+    const signature = `${item.time || ''}::${item.title || ''}`;
+    return start >= 18 * 60 && !seen.has(signature);
+  });
+  if (eveningShow) {
+    pushCard(eveningShow, 'Vanavond');
+  }
+
+  safeItems.forEach((item) => {
+    pushCard(item, cards.length ? 'Later vandaag' : 'Vandaag');
+  });
+
+  return cards.slice(0, 4);
+};
+
+const scheduleWeekDayMap = {
+  maandag: { jsDay: 1, key: 'monday', shortLabel: 'Ma', label: 'Maandag' },
+  dinsdag: { jsDay: 2, key: 'tuesday', shortLabel: 'Di', label: 'Dinsdag' },
+  woensdag: { jsDay: 3, key: 'wednesday', shortLabel: 'Wo', label: 'Woensdag' },
+  donderdag: { jsDay: 4, key: 'thursday', shortLabel: 'Do', label: 'Donderdag' },
+  vrijdag: { jsDay: 5, key: 'friday', shortLabel: 'Vr', label: 'Vrijdag' },
+  zaterdag: { jsDay: 6, key: 'saturday', shortLabel: 'Za', label: 'Zaterdag' },
+  zondag: { jsDay: 0, key: 'sunday', shortLabel: 'Zo', label: 'Zondag' }
+};
+
+const getScheduleItemsForDay = (items = [], dayName = '') => {
+  const normalizedDay = normalizeNeedle(dayName);
+  return (Array.isArray(items) ? items : []).filter((item) => {
+    const days = normalizeScheduleDays(item?.days);
+    if (!days.length) return true;
+    return days.includes(normalizedDay);
+  });
+};
+
+const getWeekScheduleDayDefinitions = (referenceDate = new Date()) => {
+  const weekOrder = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+  const monday = new Date(referenceDate);
+  const currentDay = monday.getDay();
+  const shift = currentDay === 0 ? -6 : 1 - currentDay;
+  monday.setHours(0, 0, 0, 0);
+  monday.setDate(monday.getDate() + shift);
+
+  return weekOrder.map((dayName, index) => {
+    const date = new Date(monday);
+    date.setDate(monday.getDate() + index);
+    const meta = scheduleWeekDayMap[dayName];
+    return {
+      ...meta,
+      date,
+      isToday: date.toDateString() === new Date(referenceDate).toDateString(),
+      dateLabel: date.toLocaleDateString('nl-BE', { day: 'numeric', month: 'long' })
+    };
+  });
+};
+
+const formatScheduleClock = (hour, minute = 0) => `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+
+const parseMixScheduleSlot = (mix) => {
+  const rawSchedule = String(mix?.schedule || '').trim();
+  const normalized = normalizeNeedle(rawSchedule);
+  const dayMatch = normalized.match(/(maandag|dinsdag|woensdag|donderdag|vrijdag|zaterdag|zondag)/);
+  const timeMatch = normalized.match(/(\d{1,2})(?::(\d{2}))?\s*(?:uur)?\s*(?:-|tot|en)\s*(\d{1,2})(?::(\d{2}))?\s*(?:uur)?/);
+  if (!dayMatch || !timeMatch) return null;
+
+  const dayMeta = scheduleWeekDayMap[dayMatch[1]];
+  if (!dayMeta) return null;
+
+  const startHour = Number(timeMatch[1] || 0);
+  const startMinute = Number(timeMatch[2] || 0);
+  const endHour = Number(timeMatch[3] || 0);
+  const endMinute = Number(timeMatch[4] || 0);
+
+  return {
+    ...dayMeta,
+    time: `${formatScheduleClock(startHour, startMinute)} - ${formatScheduleClock(endHour % 24, endMinute)}`,
+    title: mix.title || 'Mix',
+    description: mix.description || 'Mixprogramma op Radio Accent.',
+    host: mix.dj || '',
+    image: mix.cover || ''
+  };
+};
+
+const buildWeekScheduleData = (referenceDate = new Date()) => {
+  const baseSchedule = (Array.isArray(getCmsData().schedule) ? getCmsData().schedule : [])
+    .map(normalizeHomepageScheduleItem)
+    .filter(Boolean);
+  const mixScheduleItems = getSortedMixes()
+    .map((mix) => parseMixScheduleSlot(mix))
+    .filter(Boolean);
+
+  return getWeekScheduleDayDefinitions(referenceDate).map((day) => {
+    const items = [...getScheduleItemsForDay(baseSchedule, day.label), ...mixScheduleItems.filter((item) => item.jsDay === day.jsDay)]
+      .sort((left, right) => getScheduleTimeStart(left) - getScheduleTimeStart(right));
+    const snapshot = day.isToday ? getScheduleSnapshot(items, referenceDate) : { currentIndex: -1, nextIndex: -1 };
+
+    return {
+      ...day,
+      items: items.map((item, index) => ({
+        ...item,
+        isCurrent: snapshot.currentIndex === index,
+        isNext: snapshot.nextIndex === index
+      }))
+    };
+  });
+};
+
+const updateSchedulePageHero = (today, fallbackDay) => {
+  const activeDay = today || fallbackDay || null;
+  const snapshot = getScheduleSnapshot(activeDay?.items || []);
+  const current = snapshot.current || activeDay?.items?.[0] || null;
+  const next = snapshot.next || activeDay?.items?.[1] || null;
+
+  const currentTitle = document.getElementById('schedule-page-current-title');
+  const currentSlot = document.getElementById('schedule-page-current-slot');
+  const currentDescription = document.getElementById('schedule-page-current-description');
+  const nextTitle = document.getElementById('schedule-page-next-title');
+  const dayLabel = document.getElementById('schedule-page-day-label');
+
+  if (currentTitle) currentTitle.textContent = current?.title || 'Programma-info volgt';
+  if (currentSlot) currentSlot.textContent = current?.time || '--:-- - --:--';
+  if (currentDescription) currentDescription.textContent = current?.description || 'De weekplanning wordt hieronder automatisch opgebouwd.';
+  if (nextTitle) nextTitle.textContent = next ? `${next.title}${next.time ? ` | ${next.time}` : ''}` : 'Nieuwe show volgt';
+  if (dayLabel) {
+    dayLabel.textContent = activeDay ? `${activeDay.label} ${activeDay.dateLabel}` : 'Weekoverzicht laadt...';
+  }
+};
+
 const getLatestMixItem = () => {
   const feedMixes = getFeedMixes();
   const mixes = (feedMixes.length ? feedMixes : getCmsData().mixes).slice();
@@ -2960,6 +3534,24 @@ const getLatestMixItem = () => {
 const getHomePromoItems = () => {
   const cmsData = getCmsData();
   const fallbackImage = sanitizeMediaUrl(config.defaultDabSlide || 'assets/logo_dab.png', { fallback: 'assets/logo_dab.png' });
+  const homepageBlocks = getHomepageBlocks();
+  const generatedRegionItems = Array.isArray(homepageBlocks?.regionNews?.items)
+    ? homepageBlocks.regionNews.items.map((item, index) => ({
+      id: `generated-region-${index}`,
+      kicker: homepageBlocks.regionNews?.title || 'Uit de regio',
+      title: item.title || 'Regionieuws',
+      text: item.excerpt || 'Lees de laatste update uit de regio.',
+      meta: item.meta || 'Actuele update',
+      image: sanitizeMediaUrl(item.image || '', { fallback: fallbackImage }),
+      ctaLabel: item.linkLabel || 'Lees meer',
+      ctaLink: item.linkUrl || 'nieuws.html'
+    })).filter((item) => item.title && item.text)
+    : [];
+
+  if (generatedRegionItems.length) {
+    return generatedRegionItems.slice(0, 5);
+  }
+
   const newsItems = getSortedNewsItems().slice(0, 5).map((item, index) => ({
     id: item.id || `news-${index}`,
     kicker: item.pinned ? 'Belangrijk nieuws' : 'Laatste nieuws',
@@ -3177,36 +3769,90 @@ const updateProgramNowNextUi = () => {
 };
 
 const renderSchedulePage = () => {
-  const target = document.getElementById('schedule-list');
-  if (!target) return;
-  const schedule = getCmsData().schedule;
-  const snapshot = getScheduleSnapshot(schedule);
-  if (!schedule.length) {
-    target.innerHTML = renderEmptyStateCard({
+  const tabs = document.getElementById('week-schedule-tabs');
+  const panel = document.getElementById('week-schedule-panel');
+  if (!tabs || !panel) return;
+
+  const days = buildWeekScheduleData(new Date());
+  const hasItems = days.some((day) => day.items.length);
+  if (!hasItems) {
+    tabs.innerHTML = '';
+    panel.innerHTML = renderEmptyStateCard({
       title: 'Nog geen programma\'s',
       text: 'Voeg in de beheerconsole programma-items toe om deze pagina te vullen.',
       tone: 'info'
     });
     return;
   }
-  target.innerHTML = schedule.map((item, actualIndex) => {
-    return `
-    <article class="schedule-row${snapshot.currentIndex === actualIndex ? ' is-live' : ''}${snapshot.nextIndex === actualIndex ? ' is-next' : ''}">
-      <p>${escapeHtml(item.time)}</p>
-      <div class="schedule-copy">
-        <h3>${escapeHtml(item.title)}</h3>
-        <p>${escapeHtml(item.description || '')}</p>
-        ${item.host ? `<p class="schedule-host">Met ${escapeHtml(item.host)}</p>` : ''}
-        ${(snapshot.currentIndex === actualIndex || snapshot.nextIndex === actualIndex) ? `
-          <div class="schedule-badges">
-            ${snapshot.currentIndex === actualIndex ? '<span class="schedule-badge schedule-badge-live">Nu op antenne</span>' : ''}
-            ${snapshot.nextIndex === actualIndex ? '<span class="schedule-badge schedule-badge-next">Hierna</span>' : ''}
-          </div>
-        ` : ''}
+
+  const defaultDay = days.find((day) => day.isToday) || days[0];
+  const activeKey = String(window.__RADIO_ACCENT_WEEK_SCHEDULE_ACTIVE_DAY || defaultDay.key);
+  const activeDay = days.find((day) => day.key === activeKey) || defaultDay;
+  const highlights = getScheduleHighlightCards(activeDay.items, { preferLive: activeDay.isToday });
+
+  updateSchedulePageHero(days.find((day) => day.isToday) || activeDay, activeDay);
+
+  tabs.innerHTML = days.map((day) => `
+    <button
+      class="week-schedule-tab${day.key === activeDay.key ? ' is-active' : ''}${day.isToday ? ' is-today' : ''}"
+      type="button"
+      role="tab"
+      aria-selected="${day.key === activeDay.key ? 'true' : 'false'}"
+      data-week-day="${escapeHtml(day.key)}"
+    >
+      <span>${escapeHtml(day.shortLabel)}</span>
+      <strong>${escapeHtml(day.date.toLocaleDateString('nl-BE', { day: '2-digit', month: '2-digit' }))}</strong>
+    </button>
+  `).join('');
+
+  panel.innerHTML = `
+    <article class="week-day-sheet">
+      <div class="week-day-head">
+        <div>
+          <p class="section-label">${activeDay.isToday ? 'Vandaag op antenne' : 'Dagplanning'}</p>
+          <h3>${escapeHtml(activeDay.label)}</h3>
+          <p class="week-day-subtitle">${escapeHtml(activeDay.dateLabel)}</p>
+        </div>
+        <a class="btn btn-small btn-ghost" href="playlist.html">Bekijk playlist</a>
+      </div>
+      <div class="week-day-highlights">
+        ${highlights.map(({ item, kicker }) => `
+          <article class="week-highlight-card${item.isCurrent ? ' is-live' : ''}${item.isNext ? ' is-next' : ''}">
+            <p class="program-page-meta-label">${escapeHtml(kicker)}</p>
+            <strong>${escapeHtml(item.title)}</strong>
+            <span>${escapeHtml(item.time)}</span>
+          </article>
+        `).join('')}
+      </div>
+      <div class="week-day-list">
+        ${activeDay.items.map((item) => `
+          <article class="week-schedule-item${item.isCurrent ? ' is-live' : ''}${item.isNext ? ' is-next' : ''}">
+            <div class="week-schedule-time">
+              <strong>${escapeHtml(item.time)}</strong>
+            </div>
+            <div class="week-schedule-copy">
+              <h4>${escapeHtml(item.title)}</h4>
+              <p>${escapeHtml(item.description || 'Programma op Radio Accent.')}</p>
+              ${item.host ? `<p class="schedule-host">Met ${escapeHtml(item.host)}</p>` : ''}
+              ${(item.isCurrent || item.isNext) ? `
+                <div class="schedule-badges">
+                  ${item.isCurrent ? '<span class="schedule-badge schedule-badge-live">Nu op antenne</span>' : ''}
+                  ${item.isNext ? '<span class="schedule-badge schedule-badge-next">Hierna</span>' : ''}
+                </div>
+              ` : ''}
+            </div>
+          </article>
+        `).join('')}
       </div>
     </article>
   `;
-  }).join('');
+
+  tabs.querySelectorAll('[data-week-day]').forEach((button) => {
+    button.onclick = () => {
+      window.__RADIO_ACCENT_WEEK_SCHEDULE_ACTIVE_DAY = button.getAttribute('data-week-day') || defaultDay.key;
+      renderSchedulePage();
+    };
+  });
 };
 
 const getSortedMixes = () => {
@@ -3313,7 +3959,6 @@ const renderMixGrid = (targetId, limit = null) => {
   const target = document.getElementById(targetId);
   if (!target) return;
   const mixes = getSortedMixes();
-  const fallbackImage = sanitizeMediaUrl(config.defaultDabSlide || 'assets/logo_dab.png', { fallback: 'assets/logo_dab.png' });
   if (!mixes.length) {
     target.innerHTML = renderEmptyStateCard({
       title: 'Nog geen mixen beschikbaar',
@@ -3325,9 +3970,17 @@ const renderMixGrid = (targetId, limit = null) => {
 
   const safeMixes = typeof limit === 'number' ? mixes.slice(0, limit) : mixes;
 
-  target.innerHTML = safeMixes.map((mix) => `
+  target.innerHTML = safeMixes.map((mix) => renderMixCardMarkup(mix, {
+    featured: false,
+    showDetails: targetId === 'mixes-library'
+  })).join('');
+};
+
+const renderMixCardMarkup = (mix, { featured = false, showDetails = false } = {}) => {
+  const fallbackImage = sanitizeMediaUrl(config.defaultDabSlide || 'assets/logo_dab.png', { fallback: 'assets/logo_dab.png' });
+  return `
     <article
-      class="mix-card mix-card-playable"
+      class="mix-card mix-card-playable${featured ? ' mix-card-featured' : ''}"
       data-mix-stream="${escapeHtml(sanitizeMediaUrl(mix.streamUrl))}"
       data-mix-cover="${escapeHtml(sanitizeMediaUrl(mix.cover, { fallback: fallbackImage }))}"
       data-mix-title="${escapeHtml(mix.title)}"
@@ -3343,6 +3996,7 @@ const renderMixGrid = (targetId, limit = null) => {
     >
       <img class="mix-cover" src="${escapeHtml(sanitizeMediaUrl(mix.cover, { fallback: fallbackImage }))}" alt="${escapeHtml(mix.title)}" loading="lazy" />
       <div class="mix-content">
+        ${featured ? '<p class="section-label">Featured mix</p>' : ''}
         <p class="mix-slot">${escapeHtml(mix.schedule || 'Schema volgt')}</p>
         ${isRecentMixUpload(mix) ? '<span class="mix-badge mix-badge-new">Nieuw</span>' : ''}
         <h3>${escapeHtml(mix.title)}</h3>
@@ -3350,12 +4004,50 @@ const renderMixGrid = (targetId, limit = null) => {
         ${mix.updatedAt ? `<p class="mix-updated">${escapeHtml(formatMixUpdatedLabel(mix.updatedAt))}</p>` : ''}
         <p class="mix-description">${escapeHtml(mix.description || '')}</p>
         <div class="mix-card-actions">
-          <span class="mix-cta">Speel in player</span>
-          ${targetId === 'mixes-library' ? '<button class="btn btn-small btn-ghost mix-details-trigger" type="button">Details & archief</button>' : ''}
+          <span class="mix-cta">${featured ? 'Beluister replay' : 'Speel in player'}</span>
+          ${showDetails ? '<button class="btn btn-small btn-ghost mix-details-trigger" type="button">Details & archief</button>' : ''}
         </div>
       </div>
     </article>
-  `).join('');
+  `;
+};
+
+const renderHomeMixShowcase = () => {
+  const featuredTarget = document.getElementById('home-featured-mix');
+  const listTarget = document.getElementById('home-mixes-list');
+  if (!featuredTarget || !listTarget) return;
+
+  const blocks = getResolvedHomepageBlocks();
+  const mixes = getSortedMixes();
+  if (!mixes.length) {
+    const emptyMarkup = renderEmptyStateCard({
+      title: 'Nog geen mixen beschikbaar',
+      text: 'De volgende replay verschijnt hier automatisch zodra er mixen beschikbaar zijn.',
+      tone: 'info',
+      compact: true
+    });
+    featuredTarget.innerHTML = emptyMarkup;
+    listTarget.innerHTML = '';
+    return;
+  }
+
+  const featuredMix = mixes.find((mix) => {
+    if (blocks.latestMix?.slug && mix.slug) return mix.slug === blocks.latestMix.slug;
+    if (blocks.latestMix?.title) return mix.title === blocks.latestMix.title;
+    return false;
+  }) || mixes[0];
+
+  const extraMixes = mixes.filter((mix) => mix !== featuredMix).slice(0, 3);
+
+  featuredTarget.innerHTML = renderMixCardMarkup(featuredMix, { featured: true });
+  listTarget.innerHTML = extraMixes.length
+    ? extraMixes.map((mix) => renderMixCardMarkup(mix)).join('')
+    : renderEmptyStateCard({
+      title: 'Meer mixen volgen snel',
+      text: 'De featured mix staat alvast klaar om te beluisteren.',
+      tone: 'info',
+      compact: true
+    });
 };
 
 const renderMixLibrary = () => {
@@ -3376,10 +4068,12 @@ const renderCmsContent = () => {
   renderHomePromoStrip();
   renderSchedulePage();
   updateProgramNowNextUi();
-  renderMixGrid('home-mixes-list', Number(config.cms?.mixesPageSizeHome || 3));
+  renderHomeMixShowcase();
   renderMixGrid('program-mixes-list', 3);
   renderMixLibrary();
   void renderPublicStatusPage();
+  void fetchHomepageBlocks();
+  startHomepageBlocksRefresh();
   startLiveMediaRotation();
   bindMixCards();
   updateCurrentNav(window.location.href);
@@ -3389,8 +4083,10 @@ const startProgramClock = () => {
   if (window.__RADIO_ACCENT_PROGRAM_TIMER) return;
   window.__RADIO_ACCENT_PROGRAM_TIMER = window.setInterval(() => {
     updateProgramNowNextUi();
+    renderHomeSchedule();
     renderSchedulePage();
     renderHomePromoStrip();
+    renderHomeMixShowcase();
   }, 60000);
 };
 
@@ -3448,12 +4144,32 @@ const bindMixCards = () => {
 const createScheduleEditorRow = (item = {}) => {
   const row = document.createElement('div');
   row.className = 'admin-row';
+  const activeDays = normalizeScheduleDays(item.days);
+  const appliesToAllDays = !activeDays.length;
   row.innerHTML = `
     <label>Tijdslot<input data-field="time" type="text" value="${escapeHtml(item.time || '')}" placeholder="bv. 20:00 - 22:00" /></label>
     <label>Titel<input data-field="title" type="text" value="${escapeHtml(item.title || '')}" placeholder="Programmanaam" /></label>
     <label>Host / Presentator<input data-field="host" type="text" value="${escapeHtml(item.host || '')}" placeholder="bv. DJ Accent" /></label>
     <label>Beschrijving<textarea data-field="description" rows="2" placeholder="Korte omschrijving">${escapeHtml(item.description || '')}</textarea></label>
     <label>Programmaslide URL<input data-field="image" type="text" value="${escapeHtml(item.image || '')}" placeholder="assets/promo-cover.jpg" /></label>
+    <div class="admin-row-span-2">
+      <span class="admin-field-label">Dagen van de week</span>
+      <div class="admin-weekday-picker" role="group" aria-label="Kies de dagen waarop dit programma loopt">
+        ${WEEKDAY_OPTIONS.map((day) => `
+          <label class="admin-checkbox admin-weekday-option">
+            <input
+              data-field="days"
+              data-array="true"
+              type="checkbox"
+              value="${escapeHtml(day.value)}"
+              ${appliesToAllDays || activeDays.includes(day.value) ? 'checked' : ''}
+            />
+            <span>${escapeHtml(day.label)}</span>
+          </label>
+        `).join('')}
+      </div>
+      <p class="admin-field-hint">Laat alles aangevinkt voor een dagelijks blok. Vink alleen specifieke dagen aan voor weekshows.</p>
+    </div>
     <button class="btn btn-small btn-ghost" type="button" data-action="remove">Verwijder</button>
   `;
   return row;
@@ -3659,7 +4375,17 @@ const collectEditorRows = (container, normalizer) => {
   return [...container.querySelectorAll('.admin-row')].map((row) => {
     const raw = {};
     row.querySelectorAll('[data-field]').forEach((input) => {
-      raw[input.dataset.field] = input.type === 'checkbox' ? input.checked : input.value;
+      const fieldName = String(input.dataset.field || '').trim();
+      if (!fieldName) return;
+      const isArrayField = input.dataset.array === 'true';
+      if (isArrayField) {
+        if (!Array.isArray(raw[fieldName])) raw[fieldName] = [];
+        if (input.type === 'checkbox' && input.checked) {
+          raw[fieldName].push(input.value);
+        }
+        return;
+      }
+      raw[fieldName] = input.type === 'checkbox' ? input.checked : input.value;
     });
     return normalizer(raw);
   });

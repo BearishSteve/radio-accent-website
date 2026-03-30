@@ -97,6 +97,12 @@ window.RADIO_ACCENT_CONFIG = {
     mixesPageSizeHome: 3,
     mixesFeedUrl: 'assets/mixen/mixes.json'
   },
+  homepage: {
+    blocksEndpoint: 'api/data/homepage_blocks.json',
+    scheduleEndpoint: 'api/data/schedule_today.json',
+    regionNewsEndpoint: 'api/data/region_news.json',
+    weekendTipsEndpoint: 'api/data/weekend_tips.json'
+  },
   defaults: {
     schedule: [
       { time: '06:00 - 07:00', title: 'Accent Start', description: 'Kalm ontwaken met zachte hits en headlines.', host: '', image: '' },

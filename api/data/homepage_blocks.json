@@ -1,0 +1,145 @@
+{
+    "generatedAt": "2026-03-30T21:46:22+00:00",
+    "onAir": {
+        "title": "Nu op antenne",
+        "showTitle": "Accent Avondmix",
+        "slot": "20:00 - 22:00",
+        "description": "Rustige opbouw met moderne klassiekers.",
+        "host": "",
+        "trackTitle": "Eyes Closed",
+        "trackArtist": "JISOO & ZAYN",
+        "cover": "https://www.radioaccent.be/radioplayer/albumart/JISOO & ZAYN - Eyes Closed.jpg",
+        "linkLabel": "Luister live",
+        "linkUrl": "https://clubfmserver.be/accentdab.mp3"
+    },
+    "todaySchedule": {
+        "title": "Vandaag op Radio Accent",
+        "dayLabel": "maandag 30 maart",
+        "items": [
+            {
+                "time": "06:00 - 07:00",
+                "title": "Accent Start",
+                "description": "Kalm ontwaken met zachte hits en headlines.",
+                "host": "",
+                "image": "",
+                "isCurrent": false,
+                "isNext": true
+            },
+            {
+                "time": "07:00 - 10:00",
+                "title": "Accent Ochtend",
+                "description": "Nieuws, verkeer en energieke muziek voor je dagstart.",
+                "host": "",
+                "image": "",
+                "isCurrent": false,
+                "isNext": false
+            },
+            {
+                "time": "10:00 - 13:00",
+                "title": "Accent Werkdag",
+                "description": "Feelgood tracks en updates uit de regio.",
+                "host": "",
+                "image": "",
+                "isCurrent": false,
+                "isNext": false
+            },
+            {
+                "time": "13:00 - 16:00",
+                "title": "Accent Middag",
+                "description": "De ideale mix voor je namiddag op kantoor of thuis.",
+                "host": "",
+                "image": "",
+                "isCurrent": false,
+                "isNext": false
+            },
+            {
+                "time": "16:00 - 19:00",
+                "title": "Accent Drive",
+                "description": "De rit naar huis met verkeer, nieuws en requests.",
+                "host": "",
+                "image": "",
+                "isCurrent": false,
+                "isNext": false
+            },
+            {
+                "time": "20:00 - 22:00",
+                "title": "Accent Avondmix",
+                "description": "Rustige opbouw met moderne klassiekers.",
+                "host": "",
+                "image": "",
+                "isCurrent": true,
+                "isNext": false
+            }
+        ]
+    },
+    "regionNews": {
+        "title": "Uit de regio",
+        "items": [
+            {
+                "title": "Radio Accent bundelt lokale updates in een snellere nieuwsstroom",
+                "excerpt": "Regionieuws, verkeer en stationupdates krijgen voortaan een vaste plek op de homepage.",
+                "meta": "Laatste nieuws",
+                "linkLabel": "Bekijk nieuws",
+                "linkUrl": "nieuws.html",
+                "image": "assets/nieuws-cover.jpg"
+            },
+            {
+                "title": "Accent Drive zoekt extra filetips en omleidingen uit de streek",
+                "excerpt": "Heb je een lokale tip? Geef ze door zodat de redactie ze mee kan nemen in de volgende update.",
+                "meta": "Verkeer & regio",
+                "linkLabel": "Stuur een tip",
+                "linkUrl": "contact.html?topic=request-tip&source=regio",
+                "image": "assets/verkeer-cover.jpg"
+            },
+            {
+                "title": "Nieuwe mixen en playlisthoogtepunten staan nu centraal op de site",
+                "excerpt": "Luisteraars vinden sneller de nieuwste mix, recente tracks en extra acties van Radio Accent.",
+                "meta": "Site-update",
+                "linkLabel": "Open mixen",
+                "linkUrl": "mixen.html",
+                "image": "assets/promo-cover.jpg"
+            }
+        ]
+    },
+    "weekendTips": {
+        "title": "Weekendtips",
+        "items": [
+            {
+                "title": "Vrijdagavondmix om te bewaren",
+                "excerpt": "De donderdag warming-up voor het weekend!",
+                "meta": "Elke donderdag avond tussen 22 en 23 uur",
+                "linkLabel": "Open mixen",
+                "linkUrl": "mixen.html",
+                "image": ""
+            },
+            {
+                "title": "Start je weekend met de nieuwste avondmix",
+                "excerpt": "Vrijdagavond staat de recentste mix klaar om live of on demand te beluisteren.",
+                "meta": "Vrijdagavond",
+                "linkLabel": "Beluister mixen",
+                "linkUrl": "mixen.html",
+                "image": "assets/promo-cover.jpg"
+            },
+            {
+                "title": "Gebruik de playlist om nieuwe favorieten terug te vinden",
+                "excerpt": "Heb je een track gehoord onderweg? De playlist geeft je snel het juiste nummer terug.",
+                "meta": "Muziektip",
+                "linkLabel": "Open playlist",
+                "linkUrl": "playlist.html",
+                "image": "assets/cover.jpg"
+            }
+        ]
+    },
+    "latestMix": {
+        "title": "FREQUENCIES",
+        "dj": "DJ IRISSS",
+        "schedule": "Elke donderdag avond tussen 22 en 23 uur",
+        "description": "De donderdag warming-up voor het weekend!",
+        "streamUrl": "https://www.radioaccent.be/assets/mixen/frequencies/latest.mp3",
+        "cover": "",
+        "updatedAt": "2026-03-11T15:24:11+00:00",
+        "slug": "dj-irisss-frequencies",
+        "linkLabel": "Open mixen",
+        "linkUrl": "mixen.html"
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "generatedAt": "2026-03-30T22:20:00+02:00",
+    "title": "Uit de regio",
+    "items": [
+        {
+            "title": "Radio Accent bundelt lokale updates in een snellere nieuwsstroom",
+            "excerpt": "Regionieuws, verkeer en stationupdates krijgen voortaan een vaste plek op de homepage.",
+            "meta": "Laatste nieuws",
+            "linkLabel": "Bekijk nieuws",
+            "linkUrl": "nieuws.html",
+            "image": "assets/nieuws-cover.jpg"
+        },
+        {
+            "title": "Accent Drive zoekt extra filetips en omleidingen uit de streek",
+            "excerpt": "Heb je een lokale tip? Geef ze door zodat de redactie ze mee kan nemen in de volgende update.",
+            "meta": "Verkeer & regio",
+            "linkLabel": "Stuur een tip",
+            "linkUrl": "contact.html?topic=request-tip&source=regio",
+            "image": "assets/verkeer-cover.jpg"
+        },
+        {
+            "title": "Nieuwe mixen en playlisthoogtepunten staan nu centraal op de site",
+            "excerpt": "Luisteraars vinden sneller de nieuwste mix, recente tracks en extra acties van Radio Accent.",
+            "meta": "Site-update",
+            "linkLabel": "Open mixen",
+            "linkUrl": "mixen.html",
+            "image": "assets/promo-cover.jpg"
+        }
+    ]
+}

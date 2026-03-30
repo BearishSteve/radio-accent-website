@@ -17,6 +17,15 @@ test('homepage shows key live listening elements', async ({ page }) => {
   await expect(page.locator('#player-dock')).toBeVisible();
 });
 
+test('program page renders the new weekplanning overview', async ({ page }) => {
+  await page.goto('/programmas.html', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.locator('#week-schedule-tabs')).toBeVisible();
+  await expect(page.locator('#week-schedule-tabs .week-schedule-tab')).toHaveCount(7);
+  await expect(page.locator('#week-schedule-panel .week-schedule-item').first()).toBeVisible();
+  await expect(page.locator('#schedule-page-current-title')).toBeVisible();
+});
+
 test('mix page renders playable cards and syncs the player state', async ({ page }) => {
   await page.goto('/mixen.html', { waitUntil: 'domcontentloaded' });
 
